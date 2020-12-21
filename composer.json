@@ -10,6 +10,7 @@
 	],
 	"require": {
 		"php": ">=7.0",
+		"phpseclib/phpseclib": "~2.0",
 		"laravel/framework": ">=6.0"
 	},
 	"autoload": {

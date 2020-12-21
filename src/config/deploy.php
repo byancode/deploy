@@ -7,6 +7,8 @@ return [
             'remote' => env('DEPLOY_GIT_BIN_REMOTE', '/usr/bin/git'),
         ],
         'commit' => env('DEPLOY_GIT_COMMIT', 'deploy updated'),
+        'user' => env('DEPLOY_GIT_USER', 'root'),
+        'pass' => env('DEPLOY_GIT_PASS', '1234'),
     ],
     'ssh' => [
         'path' => env('DEPLOY_SSH_PATH', '/www/wwwroot/'),

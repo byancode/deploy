@@ -3,6 +3,7 @@
 namespace Byancode\Deploy\Commands;
 
 use Illuminate\Console\Command;
+use phpseclib3\Net\SSH2;
 
 class GitCommand extends Command
 {
@@ -31,53 +32,30 @@ class GitCommand extends Command
 
         $dir = base_path();
         $bin = config('deploy.git.bin.local');
-        $message = addslashes($this->option('commit') ?? config('deploy.git.commit'));
-        $output = shell_exec("cd $dir && $bin commit -a -m \"$message\" && $bin push");
+        $message = $this->option('commit');
+        $message = addslashes($message ? $message : config('deploy.git.commit'));
+        $output = shell_exec("cd \"$dir\" && \"$bin\" commit -a -m \"$message\"");
+        $output .= PHP_EOL;
+        $output .= shell_exec("cd \"$dir\" && \"$bin\" push");
 
         echo $output . PHP_EOL;
 
-        /* Notifica al usuario si el servidor ha terminado la conexión */
-        function ssh_disconnect($reason, $message, $language)
-        {
-            printf("Servidor desconectado con el siguiente código [%d] y mensaje: %s\n",
-                $reason, $message);
-        }
-
-        $connection = ssh2_connect(
-            config('deploy.ssh.host'),
-            config('deploy.ssh.port', 22),
-            [
-                'disconnect' => 'ssh_disconnect',
-            ]
-        );
-
-        if (!$connection) {
+        $ssh = new SSH2(config('deploy.ssh.host'));
+        if (!$ssh->login(config('deploy.ssh.user'), config('deploy.ssh.pass'))) {
             die('Conexión fallida' . PHP_EOL);
         }
-
-        $success = ssh2_auth_password(
-            $connection,
-            config('deploy.ssh.user'),
-            config('deploy.ssh.pass')
-        );
-
-        if (!$success) {
-            die('Authenticate failed' . PHP_EOL);
-        }
-
         $dir = config('deploy.ssh.path');
         $bin = config('deploy.git.bin.remote');
-        $stdout_stream = ssh2_exec($connection, "cd $dir && $bin pull");
-        $err_stream = ssh2_fetch_stream($stdout_stream, SSH2_STREAM_STDERR);
-        $dio_stream = ssh2_fetch_stream($stdout_stream, SSH2_STREAM_STDDIO);
-
-        stream_set_blocking($err_stream, true);
-        stream_set_blocking($dio_stream, true);
-
-        $result_err = stream_get_contents($err_stream);
-        $result_dio = stream_get_contents($dio_stream);
-
-        echo $result_dio . PHP_EOL;
-        echo $result_err . PHP_EOL;
+        echo $ssh->read('~$');
+        $ssh->write("cd $dir" . PHP_EOL);
+        echo $ssh->read('~$');
+        $ssh->write("$bin fetch" . PHP_EOL);
+        echo $ssh->read('~$');
+        $ssh->write("$bin pull" . PHP_EOL);
+        echo $ssh->read('Username');
+        $ssh->write(config('deploy.git.user'));
+        echo $ssh->read('Password');
+        $ssh->write(config('deploy.git.pass'));
+        $ssh->read();
     }
 }
