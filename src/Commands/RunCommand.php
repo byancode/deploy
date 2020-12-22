@@ -78,9 +78,9 @@ class RunCommand extends Command
         ) {
             $this->git();
         } else {
-            $composer && $this->composer();
-            $yarn && $this->yarn();
             $git && $this->git();
+            $yarn && $this->yarn();
+            $composer && $this->composer();
         }
 
         if (empty($after) === false) {
