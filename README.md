@@ -35,5 +35,5 @@ You can change the options of your app from `config/deploy.php` file
 ## Usage
 
 ```bash
-php artisan deploy:git --commit="My first deploy"
+php artisan deploy:run --commit="My first deploy" --git --yarn --composer
 ```

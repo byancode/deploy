@@ -10,6 +10,12 @@ return [
         'user' => env('DEPLOY_GIT_USER', 'root'),
         'pass' => env('DEPLOY_GIT_PASS', '1234'),
     ],
+    'composer' => [
+        'bin' => env('DEPLOY_COMPOSER_BIN', 'composer'),
+    ],
+    'yarn' => [
+        'bin' => env('DEPLOY_YARN_BIN', 'yarn'),
+    ],
     'ssh' => [
         'path' => env('DEPLOY_SSH_PATH', '/www/wwwroot/'),
         'user' => env('DEPLOY_SSH_USER', 'root'),

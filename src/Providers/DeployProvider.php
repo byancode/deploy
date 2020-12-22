@@ -1,7 +1,7 @@
 <?php
 namespace Byancode\Deploy\Providers;
 
-use Byancode\Deploy\Commands\GitCommand;
+use Byancode\Deploy\Commands\RunCommand;
 use Illuminate\Support\ServiceProvider;
 
 class DeployProvider extends ServiceProvider
@@ -19,7 +19,7 @@ class DeployProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                GitCommand::class,
+                RunCommand::class,
             ]);
         }
     }
