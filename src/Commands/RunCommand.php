@@ -76,8 +76,6 @@ class RunCommand extends Command
             !$yarn &&
             !$git
         ) {
-            $this->composer();
-            $this->yarn();
             $this->git();
         } else {
             $composer && $this->composer();
@@ -115,7 +113,7 @@ class RunCommand extends Command
         $bin = config('deploy.git.bin.local');
         $message = $this->option('commit');
         $message = addslashes($message ? $message : config('deploy.git.commit'));
-        $output = shell_exec("cd \"$dir\" && \"$bin\" commit -a -m \"$message\"");
+        $output = shell_exec("cd \"$dir\" && \"$bin\" add . && \"$bin\" commit -a -m \"$message\"");
         $output .= PHP_EOL;
         $output .= shell_exec("cd \"$dir\" && \"$bin\" push");
 
