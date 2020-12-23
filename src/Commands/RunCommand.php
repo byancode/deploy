@@ -17,6 +17,7 @@ class RunCommand extends Command
         {--m|commit : GitHub commit}
         {--g|git : GitHub deploy}
         {--y|yarn : Yarn update}
+        {--only : Individual options}
         {--cmd= : After CommandLine}
         {--cmd-after= : After CommandLine}
         {--cmd-before= : Before CommandLine}
@@ -41,6 +42,7 @@ class RunCommand extends Command
         [
             $composer,
             $commit,
+            $only,
             $yarn,
             $git,
             $cmd,
@@ -49,6 +51,7 @@ class RunCommand extends Command
         ] = [
             $this->option('composer'),
             $this->option('commit'),
+            $this->option('only'),
             $this->option('yarn'),
             $this->option('git'),
             $this->option('cmd'),
@@ -74,6 +77,7 @@ class RunCommand extends Command
             !$composer &&
             !$commit &&
             !$yarn &&
+            !$only &&
             !$git
         ) {
             $this->git();
@@ -83,14 +87,14 @@ class RunCommand extends Command
             $composer && $this->composer();
         }
 
-        if (empty($after) === false) {
-            echo $this->ssh->read('~$');
-            $this->ssh->write($after . PHP_EOL);
-        }
-
         if (empty($cmd) === false) {
             echo $this->ssh->read('~$');
             $this->ssh->write($cmd . PHP_EOL);
+        }
+
+        if (empty($after) === false) {
+            echo $this->ssh->read('~$');
+            $this->ssh->write($after . PHP_EOL);
         }
 
         echo $this->ssh->read();
