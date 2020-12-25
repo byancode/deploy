@@ -127,6 +127,10 @@ class RunCommand extends Command
         echo $this->ssh->read('~$');
         $this->ssh->write("$bin fetch" . PHP_EOL);
         echo $this->ssh->read('~$');
+        $this->ssh->write("$bin reset --hard HEAD" . PHP_EOL);
+        echo $this->ssh->read('~$');
+        $this->ssh->write("$bin clean -f -d" . PHP_EOL);
+        echo $this->ssh->read('~$');
         $this->ssh->write("$bin pull" . PHP_EOL);
     }
 
