@@ -13,6 +13,7 @@ class RunCommand extends Command
      * @var string
      */
     protected $signature = 'deploy:run
+        {--pull : Only git pull}
         {--c|composer : Composer update}
         {--m|commit : GitHub commit}
         {--g|git : GitHub deploy}
@@ -113,23 +114,23 @@ class RunCommand extends Command
     }
     public function git()
     {
-        $dir = base_path();
-        $bin = config('deploy.git.bin.local');
-        $message = $this->option('commit');
-        $message = addslashes($message ? $message : config('deploy.git.commit'));
-        $output = shell_exec("cd \"$dir\" && \"$bin\" add . && \"$bin\" commit -a -m \"$message\"");
-        $output .= PHP_EOL;
-        $output .= shell_exec("cd \"$dir\" && \"$bin\" push");
-
-        echo $output . PHP_EOL;
+        if ($this->option('pull') === false) {
+            $dir = base_path();
+            $bin = config('deploy.git.bin.local');
+            $message = $this->option('commit');
+            $message = addslashes($message ? $message : config('deploy.git.commit'));
+            $output = shell_exec("cd \"$dir\" && \"$bin\" add . && \"$bin\" commit -a -m \"$message\"");
+            $output .= PHP_EOL;
+            $output .= shell_exec("cd \"$dir\" && \"$bin\" push");
+            # ---------------------
+            echo $output . PHP_EOL;
+        }
 
         $bin = config('deploy.git.bin.remote');
         echo $this->ssh->read('~$');
-        $this->ssh->write("$bin fetch" . PHP_EOL);
+        $this->ssh->write("$bin add . && $bin commit -a -m \"Deploying\" && $bin fetch" . PHP_EOL);
         echo $this->ssh->read('~$');
-        $this->ssh->write("$bin reset --hard HEAD" . PHP_EOL);
-        echo $this->ssh->read('~$');
-        $this->ssh->write("$bin clean -f -d" . PHP_EOL);
+        $this->ssh->write("$bin reset --hard HEAD && $bin clean -f -d" . PHP_EOL);
         echo $this->ssh->read('~$');
         $this->ssh->write("$bin pull" . PHP_EOL);
     }
