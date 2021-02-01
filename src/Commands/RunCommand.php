@@ -119,7 +119,7 @@ class RunCommand extends Command
             $bin = config('deploy.git.bin.local');
             $message = $this->option('commit');
             $message = addslashes($message ? $message : config('deploy.git.commit'));
-            $output = shell_exec("cd \"$dir\" && \"$bin\" add . && \"$bin\" commit -a -m \"$message\"");
+            $output = shell_exec("cd \"$dir\" && \"$bin\" add . && \"$bin\" commit -a -m \"$message\" --no-verify");
             $output .= PHP_EOL;
             $output .= shell_exec("cd \"$dir\" && \"$bin\" push");
             # ---------------------
@@ -128,9 +128,9 @@ class RunCommand extends Command
 
         $bin = config('deploy.git.bin.remote');
         echo $this->ssh->read('~$');
-        $this->ssh->write("$bin add . && $bin commit -a -m \"Deploying\" && $bin fetch" . PHP_EOL);
+        $this->ssh->write("$bin add . && $bin commit -a -m \"Deploying\" --no-verify" . PHP_EOL);
         echo $this->ssh->read('~$');
-        $this->ssh->write("$bin pull --no-edit --no-log" . PHP_EOL);
+        $this->ssh->write("$bin pull --no-edit --no-verify" . PHP_EOL);
     }
 
 }
